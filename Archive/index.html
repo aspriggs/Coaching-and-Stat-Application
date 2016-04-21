@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html ng-app="coachApp">
+<style>
+table, th , td  {
+  border: 1px solid grey;
+  border-collapse: collapse;
+  padding: 5px;
+}
+table tr:nth-child(odd) {
+  background-color: #f1f1f1;
+}
+table tr:nth-child(even) {
+  background-color: #ffffff;
+}
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<body ng-controller="playersCtrl">
+ 
+<div>
+
+<p><input type="text" ng-model="search"></p>
+
+<p>Click header to sort</p>
+
+<table>
+	<tr>
+    	<th ng-click="orderByMe('Name')">Name</th>
+        <th ng-click="orderByMe('Number')">#</th>
+        <th ng-click="orderByMe('AVG')">AVG</th>
+        <th ng-click="orderByMe('AB')">AB</th>
+        <th ng-click="orderByMe('K')">K</th>
+        <th ng-click="orderByMe('GO')">GO</th>
+        <th ng-click="orderByMe('H')">H</th>
+        <th ng-click="orderByMe('2B')">2B</th>
+        <th ng-click="orderByMe('HR')">HR</th>
+        <th ng-click="orderByMe('RBI')">RBI</th>
+        <th ng-click="orderByMe('R')">R</th>
+    </tr>
+    <tr ng-repeat="x in stats | filter: search | orderBy:myOrderBy">
+        <td>{{ x.Name }}</td>
+        <td>{{ x.Number }}</td>
+        <td>{{ (x.H/x.AB) | number:3 }}</td>
+        <td>{{ x.AB }}</td>
+        <td>{{ x.K }}</td>
+        <td>{{ x.GO }}</td>
+        <td>{{ x.H }}</td>
+        <td>{{ x.Double }}</td>
+        <td>{{ x.HR }}</td>
+        <td>{{ x.RBI }}</td>
+        <td>{{ x.R }}</td>
+    </tr>
+</table>
+ 
+</div>
+
+<hr>
+
+<form method="post" action="php/addstats.php">
+<label><strong>Add Stats</strong></label>
+Game<select ng-model="selectedGames" ng-options="z.Opponent for z in games" name="Opponents"></select>
+Player<select ng-model="selectedPlayers" ng-options="y.Name for y in players" name="Player"></select>
+<h1>You selected: {{selectedGames.Opponent}}</h1>
+<h1>You selected: {{selectedPlayers.Name}}</h1>
+<button type="submit" role="button">Add</button>
+</form>
+
+<hr>
+
+<form method="post" action="php/addplayer.php">
+<label><strong>Add Player</strong></label>
+Name: <input type="text" name="Name">
+Number: <input type="number" name="Number">
+<button type="submit" role="button">Add</button>
+</form>
+
+<form method="post" action="php/addgame.php">
+<label><strong>Add Game</strong></label>
+Opponent: <input type="text" name="Opponent">
+Date: <input type="date" name="Date">
+<button type="submit" role="button">Add</button>
+</form>
+
+
+<script>
+var app = angular.module('coachApp', []);
+app.controller('playersCtrl', function($scope, $http) {
+	
+   $http.get("http://coach.perspectiveva.com/php/gameinfo.php")
+   .then(function (response) {$scope.stats = response.data.stats;});
+   
+   $http.get("http://coach.perspectiveva.com/php/playerinfo.php")
+   .then(function (response) {$scope.players = response.data.players;});
+   
+   $http.get("http://coach.perspectiveva.com/php/gamelist.php")
+   .then(function (response) {$scope.games = response.data.games;});
+   
+   $scope.orderByMe = function(x) {
+    $scope.myOrderBy = x;
+  }
+  
+});
+</script>
+ 
+</body>
+</html>
