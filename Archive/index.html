@@ -1,105 +1,106 @@
 <!DOCTYPE html>
-<html ng-app="coachApp">
-<style>
-table, th , td  {
-  border: 1px solid grey;
-  border-collapse: collapse;
-  padding: 5px;
-}
-table tr:nth-child(odd) {
-  background-color: #f1f1f1;
-}
-table tr:nth-child(even) {
-  background-color: #ffffff;
-}
-</style>
-<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
-<body ng-controller="playersCtrl">
- 
-<div>
-
-<p><input type="text" ng-model="search"></p>
-
-<p>Click header to sort</p>
-
-<table>
-	<tr>
-    	<th ng-click="orderByMe('Name')">Name</th>
-        <th ng-click="orderByMe('Number')">#</th>
-        <th ng-click="orderByMe('AVG')">AVG</th>
-        <th ng-click="orderByMe('AB')">AB</th>
-        <th ng-click="orderByMe('K')">K</th>
-        <th ng-click="orderByMe('GO')">GO</th>
-        <th ng-click="orderByMe('H')">H</th>
-        <th ng-click="orderByMe('2B')">2B</th>
-        <th ng-click="orderByMe('HR')">HR</th>
-        <th ng-click="orderByMe('RBI')">RBI</th>
-        <th ng-click="orderByMe('R')">R</th>
-    </tr>
-    <tr ng-repeat="x in stats | filter: search | orderBy:myOrderBy">
-        <td>{{ x.Name }}</td>
-        <td>{{ x.Number }}</td>
-        <td>{{ (x.H/x.AB) | number:3 }}</td>
-        <td>{{ x.AB }}</td>
-        <td>{{ x.K }}</td>
-        <td>{{ x.GO }}</td>
-        <td>{{ x.H }}</td>
-        <td>{{ x.Double }}</td>
-        <td>{{ x.HR }}</td>
-        <td>{{ x.RBI }}</td>
-        <td>{{ x.R }}</td>
-    </tr>
-</table>
- 
+<html>
+<link href="css/coach.css" rel="stylesheet" type="text/css">
+<!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>-->
+<script src="bower_components/angular/angular.min.js"></script>
+<script src="js/controllers.js"></script>
+<body>
+<div ng-app="coachApp">
+    <!--Displays statisical data-->
+    <div ng-controller="playersCtrl">
+        <!--Search filter input to find specific data-->
+        <p><input type="text" ng-model="search"></p>
+        <small>Click header to sort</small>
+        <!-- Table displaying player stats retrieved from database-->
+        <table>
+            <tr>
+                <!--Table headers sort on click-->
+                <th ng-click="orderByMe('Name')">Name</th>
+                <th ng-click="orderByMe('Number')">#</th>
+                <th ng-click="orderByMe('AVG')">AVG</th>
+                <th ng-click="orderByMe('AB')">AB</th>
+                <th ng-click="orderByMe('K')">K</th>
+                <th ng-click="orderByMe('GO')">GO</th>
+                <th ng-click="orderByMe('H')">H</th>
+              	<th ng-click="orderByMe('Double')">2B</th>
+                <th ng-click="orderByMe('HR')">HR</th>
+                <th ng-click="orderByMe('RBI')">RBI</th>
+                <th ng-click="orderByMe('R')">R</th>
+            </tr>
+            <!-- Search filter applies here and is sorted based on table header selected-->
+            <tr ng-repeat="x in stats | filter: search | orderBy:myOrderBy">
+                <td>{{ x.Name }}</td>
+                <td>{{ x.Number }}</td>
+                <td>{{ (x.H/x.AB) | number:3 }}</td>
+                <td>{{ x.AB }}</td>
+                <td>{{ x.K }}</td>
+                <td>{{ x.GO }}</td>
+                <td>{{ x.H }}</td>
+                <td>{{ x.Double }}</td>
+                <td>{{ x.HR }}</td>
+                <td>{{ x.RBI }}</td>
+                <td>{{ x.R }}</td>
+            </tr>
+            <tr>
+            </tr>
+        </table>
+        <hr>
+        <!--Add stats to selected game and player-->
+        <form method="post" action="php/addstats.php">
+            
+            <table>
+                <tr>
+                    <th>Date</th>
+                    <th>Game</th>
+                    <th>Player</th>
+                  <th>AB</th>
+                    <th>K</th>
+                    <th>GO</th>
+                    <th>H</th>
+                    <th>2B</th>
+                    <th>HR</th>
+                    <th>RBI</th>
+                    <th>R</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <!--SelectedGames and SelectedPlayers displays the games/dates and players that require data input-->
+                    <td><select ng-model="selectedGames" ng-options="z.Date for z in games" name="Date"></select></td>
+                    <td><select ng-model="selectedGames" ng-options="z.Opponent for z in games" name="Opponents"></select></td>
+                    <td><select ng-model="selectedPlayers" ng-options="y.Name for y in players" name="Player"></select></td>
+                    <!--Form data to be inserted into the respected database-->
+                    <td><input type="text" name="AB" size="1" required></td>
+                    <td><input type="text" name="K" size="1" required></td>
+                    <td><input type="text" name="GO" size="1" required></td>
+                    <td><input type="text" name="H" size="1" required></td>
+                    <td><input type="text" name="Double" size="1" required></td>
+                    <td><input type="text" name="HR" size="1" required></td>
+                    <td><input type="text" name="RBI" size="1" required></td>
+                    <td><input type="text" name="R" size="1" required></td>
+                    <td><button type="submit" role="button">Add Stat</button></td>
+                </tr>
+            </table>
+        <!--Hidden form data to be passed along with selected data and user input -->
+            <input type="hidden" name="Player" value="{{selectedPlayers.Name}}">
+            <input type="hidden" name="PlayerID" value="{{selectedPlayers.PlayerID}}">
+            <input type="hidden" name="Game" value="{{selectedGames.Opponent}}">
+            <input type="hidden" name="Date" value="{{selectedGames.Date}}">
+            <input type="hidden" name="GameID" value="{{selectedGames.GameID}}">
+        </form>
+        <hr>
+        <!--Form adds player to database-->
+        <form method="post" action="php/addplayer.php">
+            Name: <input type="text" name="Name">
+            Number: <input type="number" name="Number">
+            <button type="submit" role="button">Add Player</button>
+        </form>
+        <!--Form adds game to database-->
+        <form method="post" action="php/addgame.php">
+            Opponent: <input type="text" name="Opponent">
+            Date: <input type="date" name="Date">
+            <button type="submit" role="button">Add Game</button>
+        </form>
+    </div>
 </div>
-
-<hr>
-
-<form method="post" action="php/addstats.php">
-<label><strong>Add Stats</strong></label>
-Game<select ng-model="selectedGames" ng-options="z.Opponent for z in games" name="Opponents"></select>
-Player<select ng-model="selectedPlayers" ng-options="y.Name for y in players" name="Player"></select>
-<h1>You selected: {{selectedGames.Opponent}}</h1>
-<h1>You selected: {{selectedPlayers.Name}}</h1>
-<button type="submit" role="button">Add</button>
-</form>
-
-<hr>
-
-<form method="post" action="php/addplayer.php">
-<label><strong>Add Player</strong></label>
-Name: <input type="text" name="Name">
-Number: <input type="number" name="Number">
-<button type="submit" role="button">Add</button>
-</form>
-
-<form method="post" action="php/addgame.php">
-<label><strong>Add Game</strong></label>
-Opponent: <input type="text" name="Opponent">
-Date: <input type="date" name="Date">
-<button type="submit" role="button">Add</button>
-</form>
-
-
-<script>
-var app = angular.module('coachApp', []);
-app.controller('playersCtrl', function($scope, $http) {
-	
-   $http.get("http://coach.perspectiveva.com/php/gameinfo.php")
-   .then(function (response) {$scope.stats = response.data.stats;});
-   
-   $http.get("http://coach.perspectiveva.com/php/playerinfo.php")
-   .then(function (response) {$scope.players = response.data.players;});
-   
-   $http.get("http://coach.perspectiveva.com/php/gamelist.php")
-   .then(function (response) {$scope.games = response.data.games;});
-   
-   $scope.orderByMe = function(x) {
-    $scope.myOrderBy = x;
-  }
-  
-});
-</script>
- 
 </body>
 </html>

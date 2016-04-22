@@ -12,7 +12,8 @@ $json = "";
 foreach($gameList as $games){
     if ($json != "") {$json .= ",";}
     $json .= '{"GameID":"'  . $games["GameID"] . '",';
-    $json .= '"Opponent":"'   . $games["Opponent"]        . ' | '. $games["Date"]     . '"}';
+    $json .= '"Opponent":"'   . $games["Opponent"] . '",';
+	$json .= '"Date":"'  . $games["Date"] . '"}';
 }
 //Specifies json title
 $json ='{"games":['.$json.']}';
